@@ -2,39 +2,41 @@ use crate::{
     entity::entity::{Direction, Entity, EntityType},
     game::gamestate::GAME,
 };
-use sdl2::keyboard::Scancode;
+use sdl2::rect::Point;
+
 pub struct PlayerEntity {}
 
 impl Entity for PlayerEntity {
-    fn update(&self, event_pump: &sdl2::EventPump) {
-        let mut x = GAME.lock().unwrap().player_x;
-        let mut y = GAME.lock().unwrap().player_y;
-        if event_pump.keyboard_state().is_scancode_pressed(Scancode::A) {
-            GAME.lock().unwrap().player_facing = Direction::WEST;
-            x -= 5.0;
-        }
+    fn update(&self, _event_pump: &mut sdl2::EventPump) {
+        let x = GAME.lock().player_position.x;
+        let y = GAME.lock().player_position.y;
+        let mut pos = Point::new(x, y);
+        let speed = GAME.lock().player_speed;
+        let facing = GAME.lock().player_facing;
 
-        if event_pump.keyboard_state().is_scancode_pressed(Scancode::D) {
-            GAME.lock().unwrap().player_facing = Direction::EAST;
-            x += 5.0;
+        match facing {
+            Direction::NORTH => {
+                pos = pos.offset(0, -speed);
+            }
+            Direction::SOUTH => {
+                pos = pos.offset(0, speed);
+            }
+            Direction::EAST => {
+                pos = pos.offset(speed, 0);
+            }
+            Direction::WEST => {
+                pos = pos.offset(-speed, 0);
+            }
         }
-
-        if event_pump.keyboard_state().is_scancode_pressed(Scancode::W) {
-            GAME.lock().unwrap().player_facing = Direction::NORTH;
-            y -= 5.0;
+        if GAME.is_locked(){
+            error!("Game object locked!");
+        } else {
+            GAME.lock().set_player_position(pos);
         }
-
-        if event_pump.keyboard_state().is_scancode_pressed(Scancode::S) {
-            GAME.lock().unwrap().player_facing = Direction::SOUTH;
-            y += 5.0;
-        }
-
-        GAME.lock().unwrap().set_player_x(x);
-        GAME.lock().unwrap().set_player_y(y);
     }
 
     fn get_texture_path(&self) -> String {
-        match GAME.lock().unwrap().player_facing {
+        match GAME.lock().player_facing {
             Direction::NORTH => return String::from("assets/player_walk_up.png"),
             Direction::SOUTH => return String::from("assets/player_walk_down.png"),
             Direction::EAST => return String::from("assets/player_walk_right.png"),
@@ -54,11 +56,10 @@ impl Entity for PlayerEntity {
         return EntityType::PLAYER;
     }
 
-    fn get_x(&self) -> f32 {
-        return GAME.lock().unwrap().player_x;
-    }
+    fn get_position(&self) -> sdl2::rect::Point {
+        let x = GAME.lock().player_position.x;
+        let y = GAME.lock().player_position.y;
 
-    fn get_y(&self) -> f32 {
-        return GAME.lock().unwrap().player_y;
+        return Point::new(x, y);
     }
 }

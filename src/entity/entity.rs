@@ -1,10 +1,12 @@
+use sdl2::rect::Point;
+
 use super::entitys::player::PlayerEntity;
 
 #[derive(Clone)]
 pub struct SpawnedEntity {
     pub entity_type: EntityType,
-    pub x: f32,
-    pub y: f32,
+    pub x: i32,
+    pub y: i32,
 }
 
 impl SpawnedEntity {
@@ -13,8 +15,8 @@ impl SpawnedEntity {
         T: Entity,
     {
         return SpawnedEntity {
-            x: entity.get_x(),
-            y: entity.get_y(),
+            x: entity.get_position().x(),
+            y: entity.get_position().y,
             entity_type: entity.get_type(),
         };
     }
@@ -23,20 +25,19 @@ impl SpawnedEntity {
         match self.entity_type {
             EntityType::PLAYER => return Box::new(PlayerEntity {}),
         }
-    }]
+    }
 }
 
 pub trait Entity {
-    fn update(&self, event_pump: &sdl2::EventPump); // called every frame after entity is rendered
+    fn update(&self, event_pump: &mut sdl2::EventPump); // called every frame after entity is rendered
     fn get_texture_path(&self) -> String;
     fn get_texture_height(&self) -> i32;
     fn get_texture_width(&self) -> i32;
     fn get_type(&self) -> EntityType;
-    fn get_x(&self) -> f32;
-    fn get_y(&self) -> f32;
+    fn get_position(&self) -> Point;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, Copy)]
 pub enum Direction {
     NORTH, // up
     SOUTH, // down

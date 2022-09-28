@@ -4,7 +4,8 @@ use sdl2::{
 };
 
 use crate::{
-    entity::entity::SpawnedEntity, gfx::assetmanager::AssetManager, tile::tile::WorldTile,
+    entity::entity::SpawnedEntity, game::gamestate::GAME, gfx::assetmanager::AssetManager,
+    tile::tile::WorldTile,
 };
 use sdl2::video::Window;
 
@@ -34,28 +35,33 @@ impl World {
     }
 
     pub fn render(&self, canvas: &mut Canvas<Window>, asset_manager: &AssetManager) {
-        let rect = Rect::new(0, 0, 1000, 1000);
-
         // render world
         for tile in self.world_data.to_vec().into_iter() {
             let point = Point::new(tile.x, tile.y);
-            if rect.contains_point(point) {
+            if GAME.lock().camera.contains_point(point) {
+                let mut dst = crate::tile::utils::get_tile_rect(tile.x, tile.y);
+                let cam_x = GAME.lock().camera.x;
+                let cam_y = GAME.lock().camera.y;
+                dst.x -= cam_x;
+                dst.y -= cam_y;
                 canvas
                     .copy(
                         asset_manager.get_texture(tile.to_tile().get_texture_path()),
                         None,
-                        crate::tile::utils::get_tile_rect(tile.x, tile.y),
+                        dst,
                     )
                     .expect("Copy failed");
             }
         }
 
         // render entitys
-        for entity in self.entity_data.to_vec().into_iter() {
+        for entity in self.entity_data.to_vec().iter() {
             let entity_info = entity.to_entity();
+            let cam_x = GAME.lock().camera.x;
+            let cam_y = GAME.lock().camera.y;
             let rect = Rect::new(
-                entity.x as i32,
-                entity.y as i32,
+                (entity.x as i32)-cam_x,
+                (entity.y as i32)-cam_y,
                 entity_info.get_texture_width() as u32,
                 entity_info.get_texture_height() as u32,
             );
@@ -69,14 +75,14 @@ impl World {
         }
     }
 
-    pub fn update_entitys(&mut self, event_pump: &sdl2::EventPump) {
+    pub fn update_entitys(&mut self, event_pump: &mut sdl2::EventPump) {
         let mut i = 0;
         for mut entity in self.entity_data.to_vec().into_iter() {
             let entity_info = entity.to_entity();
             entity_info.update(event_pump);
 
-            entity.x = entity_info.get_x();
-            entity.y = entity_info.get_y();
+            entity.x = entity_info.get_position().x;
+            entity.y = entity_info.get_position().y;
 
             self.entity_data.remove(i);
             self.entity_data.push(entity);

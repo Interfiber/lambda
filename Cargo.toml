@@ -11,8 +11,10 @@ log = "0.4.0"
 hashbrown = "0.12.3"
 perlin2d = "0.2.6"
 lazy_static = "1.4.0"
+rayon = "1.5.3"
+parking_lot = "0.12.1"
 
 [dependencies.sdl2]
 version = "0.35.2"
 default-features = false
-features = ["image", "unsafe_textures"]
+features = ["image", "unsafe_textures", "gfx"]
