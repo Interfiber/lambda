@@ -60,8 +60,8 @@ impl World {
             let cam_x = GAME.lock().camera.x;
             let cam_y = GAME.lock().camera.y;
             let rect = Rect::new(
-                (entity.x as i32)-cam_x,
-                (entity.y as i32)-cam_y,
+                (entity.x as i32) - cam_x,
+                (entity.y as i32) - cam_y,
                 entity_info.get_texture_width() as u32,
                 entity_info.get_texture_height() as u32,
             );

@@ -1,14 +1,12 @@
-use crate::entity::entity::{Direction, SpawnedEntity};
+use crate::entity::entity::SpawnedEntity;
 use crate::entity::entitys::player::PlayerEntity;
 use crate::game::gamestate::GAME;
 use crate::tile::tile::WorldTile;
 use crate::tile::tiles::grass::GrassTile;
 use perlin2d::PerlinNoise2D;
-use sdl2::event::Event;
 use sdl2::gfx::framerate::FPSManager;
-use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use sdl2::render::TextureCreator;
+use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::WindowContext;
 
 use crate::tile::tiles::water::WaterTile;
@@ -100,87 +98,16 @@ impl Window {
         canvas.set_scale(4.0, 4.0).expect("Failed to set scale");
 
         let mut fps = FPSManager::new();
-        fps.set_framerate(30).expect("Framerate set failed");
+        fps.set_framerate(60).expect("Framerate set failed");
 
         loop {
             // cam.x = GAME.lock().player_x - (screen_x/2);
             // cam.y = GAME.lock().player_y - (screen_y/2) ;
 
-            for event in event_pump.poll_iter() {
-                match event {
-                    Event::Quit { .. } => {
-                        info!("Shutting down");
-                        std::process::exit(0);
-                    }
-                    Event::KeyDown {
-                        keycode: Some(Keycode::Up),
-                        ..
-                    } => {
-                        GAME.lock().restore_speed();
-                        GAME.lock().player_facing = Direction::NORTH;
-                    }
-                    Event::KeyDown {
-                        keycode: Some(Keycode::Down),
-                        ..
-                    } => {
-                        GAME.lock().restore_speed();
-                        GAME.lock().player_facing = Direction::SOUTH;
-                    }
-                    Event::KeyDown {
-                        keycode: Some(Keycode::Left),
-                        ..
-                    } => {
-                        GAME.lock().restore_speed();
-                        GAME.lock().player_facing = Direction::WEST;
-                    }
-                    Event::KeyDown {
-                        keycode: Some(Keycode::Right),
-                        ..
-                    } => {
-                        GAME.lock().restore_speed();
-                        GAME.lock().player_facing = Direction::EAST;
-                    }
-                    Event::KeyUp {
-                        keycode: Some(Keycode::Up),
-                        ..
-                    }
-                    | Event::KeyUp {
-                        keycode: Some(Keycode::Down),
-                        ..
-                    }
-                    | Event::KeyUp {
-                        keycode: Some(Keycode::Left),
-                        ..
-                    }
-                    | Event::KeyUp {
-                        keycode: Some(Keycode::Right),
-                        ..
-                    } => {
-                        GAME.lock().player_speed = 0;
-                    }
-                    _ => {}
-                }
-            }
+            crate::gfx::events::key_events(&mut event_pump);
 
             let old = sdl_context.timer().unwrap().ticks();
-            let screen_w = GAME.lock().screen_w;
-            let screen_h = GAME.lock().screen_h;
-
-            if screen_w != canvas.output_size().unwrap().0 as i32
-                || screen_h != canvas.output_size().unwrap().1 as i32
-            {
-                GAME.lock().camera.x = 0;
-                GAME.lock().camera.y = 0;
-            } else {
-                let player_x = GAME.lock().player_position.x;
-                let player_y = GAME.lock().player_position.y;
-
-                GAME.lock().camera.x = player_x;
-                GAME.lock().camera.y = player_y;
-            }
-
-            GAME.lock().screen_w = canvas.output_size().unwrap().0 as i32;
-            GAME.lock().screen_h = canvas.output_size().unwrap().1 as i32;
+            Self::ajust_screen(&canvas);
 
             canvas.clear();
             world.update_entitys(&mut event_pump);
@@ -192,7 +119,7 @@ impl Window {
             let new = sdl_context.timer().unwrap().ticks();
 
             info!("FPS: {}", 1000 / (new - old));
-            info!("Deltatime: {}", (new - old) as f32 * 0.4);
+            // info!("Deltatime: {}", (new - old) as f32 * 0.4);
         }
     }
 
@@ -203,5 +130,25 @@ impl Window {
 
     pub fn set_fullscreen(&mut self, enabled: bool) {
         self.fullscreen = enabled;
+    }
+
+    pub fn ajust_screen(canvas: &Canvas<sdl2::video::Window>) {
+        let screen_w = GAME.lock().screen_w;
+        let screen_h = GAME.lock().screen_h;
+
+        if screen_w != canvas.output_size().unwrap().0 as i32
+            || screen_h != canvas.output_size().unwrap().1 as i32
+        {
+            GAME.lock().camera.x = 0;
+            GAME.lock().camera.y = 0;
+        } else {
+            let player_x = GAME.lock().player_position.x;
+            let player_y = GAME.lock().player_position.y;
+
+            GAME.lock().camera.x = player_x - ((screen_w/4)/2);
+            GAME.lock().camera.y = player_y - ((screen_h/4)/2);;
+        }
+        GAME.lock().screen_w = canvas.output_size().unwrap().0 as i32;
+        GAME.lock().screen_h = canvas.output_size().unwrap().1 as i32;
     }
 }

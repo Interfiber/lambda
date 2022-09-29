@@ -20,7 +20,7 @@ impl GameState {
         self.player_position = v;
     }
 
-    pub fn restore_speed(&mut self){
+    pub fn restore_speed(&mut self) {
         self.player_speed = self.player_static_speed;
     }
 }
@@ -28,12 +28,12 @@ impl GameState {
 pub fn new_gamestate() -> GameState {
     return GameState {
         player_facing: Direction::NORTH,
-        player_position: Point::new(50, 50),
+        player_position: Point::new(100, 100),
         camera: sdl2::rect::Rect::new(0, 0, 1000, 1000),
         screen_h: 0,
         screen_w: 0,
-        player_speed: 3,
-        player_static_speed: 3
+        player_speed: 0,
+        player_static_speed: 3,
     };
 }
 

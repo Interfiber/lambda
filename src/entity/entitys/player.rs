@@ -28,7 +28,7 @@ impl Entity for PlayerEntity {
                 pos = pos.offset(-speed, 0);
             }
         }
-        if GAME.is_locked(){
+        if GAME.is_locked() {
             error!("Game object locked!");
         } else {
             GAME.lock().set_player_position(pos);
