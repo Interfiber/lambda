@@ -66,8 +66,5 @@ pub fn key_events(event_pump: &mut EventPump) {
 
 pub fn mouse_events(event_pump: &EventPump) {
     let mouse_state = event_pump.mouse_state();
-    if mouse_state.left() {
-        info!("X: {}, Y: {}", mouse_state.x(), mouse_state.y());
-        GAME.lock().player_position = Point::new(mouse_state.x(), mouse_state.y());
-    }
+    info!("X: {}, Y: {}", mouse_state.x(), mouse_state.y());
 }

@@ -139,13 +139,15 @@ impl Window {
             let font_info = crate::utils::font::render_font_to_texture(
                 &font,
                 &self.texture_creator.as_ref().unwrap(),
-                &format!("FPS: {}", GAME.lock().fps.to_string())
+                &format!("FPS: {}", GAME.lock().fps.to_string()),
             );
 
-
-            let rect = Rect::new(0,0, font_info.0, font_info.1);
+            let rect = Rect::new(0, 0, font_info.0, font_info.1);
 
             canvas.copy(&font_info.2, None, rect).expect("Copy failed!");
+            unsafe {
+                font_info.2.destroy();
+            }
 
             canvas.present();
 
