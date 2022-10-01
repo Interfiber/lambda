@@ -1,18 +1,20 @@
 use crate::entity::entity::SpawnedEntity;
 use crate::entity::entitys::player::PlayerEntity;
 use crate::game::gamestate::GAME;
+use crate::gfx::fontmanager::{FontDetails, FontManager};
 use crate::tile::tile::WorldTile;
 use crate::tile::tiles::grass::GrassTile;
 use perlin2d::PerlinNoise2D;
 use sdl2::gfx::framerate::FPSManager;
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::WindowContext;
 
 use crate::tile::tiles::water::WaterTile;
 use crate::world::world::WorldTemplate;
 
-use super::assetmanager::AssetManager;
+use super::assetmanager::{AssetManager, AssetManagerTemplate};
 
 pub struct WindowTemplate {
     pub title: String,
@@ -32,7 +34,7 @@ impl WindowTemplate {
             title: title.to_string(),
             texture_creator: Default::default(),
             load_assets: false,
-            asset_manager: Default::default(),
+            asset_manager: Some(AssetManagerTemplate::new()),
             fullscreen: false,
         };
     }
@@ -40,9 +42,16 @@ impl WindowTemplate {
 
 impl Window {
     pub fn render(&mut self) {
+        info!("Creating sdl context");
         let sdl_context = sdl2::init().expect("Failed to init SDL2");
+        info!("Creating video subsystem");
         let video_subsystem = sdl_context.video().expect("Failed to get video subsystem");
+        info!("Creating ttf font subsystem");
+        let font_context = sdl2::ttf::init()
+            .map_err(|e| e.to_string())
+            .expect("Failed to init ttf");
 
+        info!("Creating window using sdl2 with OpenGL rendering");
         let window = video_subsystem
             .window(&self.title, 800, 600)
             .position_centered()
@@ -51,6 +60,7 @@ impl Window {
             .map_err(|e| e.to_string())
             .expect("Failed to create window");
 
+        info!("Creating sdl2 canvas");
         let mut canvas = window
             .into_canvas()
             .build()
@@ -68,9 +78,13 @@ impl Window {
             self.asset_manager.as_mut().unwrap().clear_queue();
         }
 
+        let mut font_manager = FontManager::new(&font_context);
+
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         canvas.present();
+
+        info!("Creating event pump");
         let mut event_pump = sdl_context
             .event_pump()
             .expect("Failed to create event punp");
@@ -100,10 +114,13 @@ impl Window {
         let mut fps = FPSManager::new();
         fps.set_framerate(60).expect("Framerate set failed");
 
+        info!("Starting game loop");
+
         loop {
             // cam.x = GAME.lock().player_x - (screen_x/2);
             // cam.y = GAME.lock().player_y - (screen_y/2) ;
 
+            crate::gfx::events::mouse_events(&event_pump);
             crate::gfx::events::key_events(&mut event_pump);
 
             let old = sdl_context.timer().unwrap().ticks();
@@ -112,20 +129,37 @@ impl Window {
             canvas.clear();
             world.update_entitys(&mut event_pump);
             world.render(&mut canvas, self.asset_manager.as_ref().unwrap());
+            let font = font_manager
+                .load(&FontDetails {
+                    path: "assets/LanaPixel.ttf".to_string(),
+                    size: 10,
+                })
+                .expect("Failed to load font");
+
+            let font_info = crate::utils::font::render_font_to_texture(
+                &font,
+                &self.texture_creator.as_ref().unwrap(),
+                &format!("FPS: {}", GAME.lock().fps.to_string())
+            );
+
+
+            let rect = Rect::new(0,0, font_info.0, font_info.1);
+
+            canvas.copy(&font_info.2, None, rect).expect("Copy failed!");
 
             canvas.present();
 
             fps.delay();
             let new = sdl_context.timer().unwrap().ticks();
 
-            info!("FPS: {}", 1000 / (new - old));
+            GAME.lock().fps = 1000 / (new - old);
             // info!("Deltatime: {}", (new - old) as f32 * 0.4);
         }
     }
 
-    pub fn load_assets_on_render(&mut self, manager: AssetManager) {
+    pub fn load_assets_on_render(&mut self, queue: Vec<String>) {
         self.load_assets = true;
-        self.asset_manager = Some(manager);
+        self.asset_manager.as_mut().unwrap().new_queue(queue);
     }
 
     pub fn set_fullscreen(&mut self, enabled: bool) {
@@ -145,8 +179,8 @@ impl Window {
             let player_x = GAME.lock().player_position.x;
             let player_y = GAME.lock().player_position.y;
 
-            GAME.lock().camera.x = player_x - ((screen_w/4)/2);
-            GAME.lock().camera.y = player_y - ((screen_h/4)/2);;
+            GAME.lock().camera.x = player_x - ((screen_w / 4) / 2);
+            GAME.lock().camera.y = player_y - ((screen_h / 4) / 2);
         }
         GAME.lock().screen_w = canvas.output_size().unwrap().0 as i32;
         GAME.lock().screen_h = canvas.output_size().unwrap().1 as i32;

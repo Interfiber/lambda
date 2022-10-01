@@ -9,6 +9,7 @@ mod entity;
 mod game;
 mod gfx;
 mod tile;
+mod utils;
 mod world;
 
 fn main() {

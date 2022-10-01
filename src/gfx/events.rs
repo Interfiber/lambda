@@ -1,9 +1,10 @@
-use sdl2::EventPump;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::rect::Point;
+use sdl2::EventPump;
 
-use crate::game::gamestate::GAME;
 use crate::entity::entity::Direction;
+use crate::game::gamestate::GAME;
 
 pub fn key_events(event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
@@ -60,5 +61,13 @@ pub fn key_events(event_pump: &mut EventPump) {
             }
             _ => {}
         }
+    }
+}
+
+pub fn mouse_events(event_pump: &EventPump) {
+    let mouse_state = event_pump.mouse_state();
+    if mouse_state.left() {
+        info!("X: {}, Y: {}", mouse_state.x(), mouse_state.y());
+        GAME.lock().player_position = Point::new(mouse_state.x(), mouse_state.y());
     }
 }

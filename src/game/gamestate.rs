@@ -13,6 +13,7 @@ pub struct GameState {
     pub camera: sdl2::rect::Rect,
     pub screen_w: i32,
     pub screen_h: i32,
+    pub fps: u32,
 }
 
 impl GameState {
@@ -34,6 +35,7 @@ pub fn new_gamestate() -> GameState {
         screen_w: 0,
         player_speed: 0,
         player_static_speed: 3,
+        fps: 0,
     };
 }
 

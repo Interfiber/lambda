@@ -37,7 +37,16 @@ impl AssetManager {
                 self.queue.as_ref().unwrap().len()
             );
 
-            let texture = match texture_creator.load_texture(asset_path) {
+            let texture = match texture_creator.load_texture(asset_path.to_string()) {
+                Ok(result) => result,
+                Err(err) => {
+                    error!("Texture loading error: {}", err);
+                    std::process::exit(-1);
+                }
+            };
+
+            self.textures.insert(asset_path.to_string(), texture);
+            let texture = match texture_creator.load_texture(asset_path.to_string()) {
                 Ok(result) => result,
                 Err(err) => {
                     error!("Texture loading error: {}", err);
@@ -49,7 +58,7 @@ impl AssetManager {
         }
 
         info!(
-            "Loaded all textures! [{}/{}]",
+            "Loaded all assets! [{}/{}]",
             i,
             self.queue.as_ref().unwrap().len()
         );
