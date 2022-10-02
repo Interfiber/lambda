@@ -8,6 +8,7 @@ mod bootstrap;
 mod entity;
 mod game;
 mod gfx;
+mod overlay;
 mod tile;
 mod utils;
 mod world;

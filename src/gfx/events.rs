@@ -1,6 +1,5 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::rect::Point;
 use sdl2::EventPump;
 
 use crate::entity::entity::Direction;
@@ -14,57 +13,58 @@ pub fn key_events(event_pump: &mut EventPump) {
                 std::process::exit(0);
             }
             Event::KeyDown {
-                keycode: Some(Keycode::Up),
+                keycode: Some(Keycode::W),
                 ..
             } => {
                 GAME.lock().restore_speed();
                 GAME.lock().player_facing = Direction::NORTH;
             }
             Event::KeyDown {
-                keycode: Some(Keycode::Down),
+                keycode: Some(Keycode::S),
                 ..
             } => {
                 GAME.lock().restore_speed();
                 GAME.lock().player_facing = Direction::SOUTH;
             }
             Event::KeyDown {
-                keycode: Some(Keycode::Left),
+                keycode: Some(Keycode::A),
                 ..
             } => {
                 GAME.lock().restore_speed();
                 GAME.lock().player_facing = Direction::WEST;
             }
             Event::KeyDown {
-                keycode: Some(Keycode::Right),
+                keycode: Some(Keycode::D),
                 ..
             } => {
                 GAME.lock().restore_speed();
                 GAME.lock().player_facing = Direction::EAST;
             }
             Event::KeyUp {
-                keycode: Some(Keycode::Up),
+                keycode: Some(Keycode::W),
                 ..
             }
             | Event::KeyUp {
-                keycode: Some(Keycode::Down),
+                keycode: Some(Keycode::S),
                 ..
             }
             | Event::KeyUp {
-                keycode: Some(Keycode::Left),
+                keycode: Some(Keycode::A),
                 ..
             }
             | Event::KeyUp {
-                keycode: Some(Keycode::Right),
+                keycode: Some(Keycode::D),
                 ..
             } => {
                 GAME.lock().player_speed = 0;
             }
+            Event::KeyDown {
+                keycode: Some(Keycode::Z),
+                ..
+            } => {
+                info!("Place tile");
+            }
             _ => {}
         }
     }
-}
-
-pub fn mouse_events(event_pump: &EventPump) {
-    let mouse_state = event_pump.mouse_state();
-    info!("X: {}, Y: {}", mouse_state.x(), mouse_state.y());
 }

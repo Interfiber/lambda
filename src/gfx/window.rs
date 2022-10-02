@@ -1,17 +1,15 @@
+use std::time::SystemTime;
+
 use crate::entity::entity::SpawnedEntity;
 use crate::entity::entitys::player::PlayerEntity;
 use crate::game::gamestate::GAME;
 use crate::gfx::fontmanager::{FontDetails, FontManager};
-use crate::tile::tile::WorldTile;
-use crate::tile::tiles::grass::GrassTile;
-use perlin2d::PerlinNoise2D;
 use sdl2::gfx::framerate::FPSManager;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::WindowContext;
 
-use crate::tile::tiles::water::WaterTile;
 use crate::world::world::WorldTemplate;
 
 use super::assetmanager::{AssetManager, AssetManagerTemplate};
@@ -80,7 +78,7 @@ impl Window {
 
         let mut font_manager = FontManager::new(&font_context);
 
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.set_draw_color(Color::GREY);
         canvas.clear();
         canvas.present();
 
@@ -92,22 +90,14 @@ impl Window {
         let mut world = WorldTemplate::new();
 
         info!("Generating world");
-        let perlin = PerlinNoise2D::new(6, 10.0, 0.5, 1.0, 2.0, (100.0, 100.0), 0.5, 1231313);
-
-        for x in 0..1000 {
-            for y in 0..1000 {
-                let noise = perlin.get_noise(x as f64, y as f64);
-
-                if noise < -6.0 {
-                    world.insert_tile(WorldTile::from_tile(x * 32, y * 32, WaterTile {}));
-                } else {
-                    world.insert_tile(WorldTile::from_tile(x * 32, y * 32, GrassTile {}));
-                }
-            }
-        }
+        let seed = SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("Failed to get time since unix epoch");
+        crate::utils::world::generate_overworld(&mut world, seed.as_millis());
 
         world.spawn_entity(SpawnedEntity::from_entity(PlayerEntity {}));
         info!("World generated");
+        GAME.lock().overworld = world;
 
         canvas.set_scale(4.0, 4.0).expect("Failed to set scale");
 
@@ -117,18 +107,13 @@ impl Window {
         info!("Starting game loop");
 
         loop {
-            // cam.x = GAME.lock().player_x - (screen_x/2);
-            // cam.y = GAME.lock().player_y - (screen_y/2) ;
-
-            crate::gfx::events::mouse_events(&event_pump);
             crate::gfx::events::key_events(&mut event_pump);
 
             let old = sdl_context.timer().unwrap().ticks();
             Self::ajust_screen(&canvas);
 
             canvas.clear();
-            world.update_entitys(&mut event_pump);
-            world.render(&mut canvas, self.asset_manager.as_ref().unwrap());
+            crate::utils::world::render_overworld(&mut event_pump, self.asset_manager.as_ref().unwrap(), &mut canvas);
             let font = font_manager
                 .load(&FontDetails {
                     path: "assets/LanaPixel.ttf".to_string(),
@@ -142,11 +127,28 @@ impl Window {
                 &format!("FPS: {}", GAME.lock().fps.to_string()),
             );
 
+            let pos = GAME.lock().player_position;
+
+            let font_info_2 = crate::utils::font::render_font_to_texture(
+                &font,
+                &self.texture_creator.as_ref().unwrap(),
+                &format!("Position: {}, {}", pos.x, pos.y),
+            );
+
             let rect = Rect::new(0, 0, font_info.0, font_info.1);
 
             canvas.copy(&font_info.2, None, rect).expect("Copy failed!");
+            canvas
+                .copy(
+                    &font_info_2.2,
+                    None,
+                    Rect::new(0, font_info.1 as i32, font_info_2.0, font_info_2.1),
+                )
+                .expect("Copy failed!");
+
             unsafe {
                 font_info.2.destroy();
+                font_info_2.2.destroy();
             }
 
             canvas.present();

@@ -2,9 +2,11 @@ use lazy_static::lazy_static;
 use parking_lot::Mutex;
 use sdl2::rect::Point;
 
-use crate::entity::entity::Direction;
+use crate::{
+    entity::entity::Direction,
+    world::world::{World, WorldTemplate},
+};
 
-#[derive(Debug)]
 pub struct GameState {
     pub player_facing: Direction,
     pub player_position: Point,
@@ -14,6 +16,7 @@ pub struct GameState {
     pub screen_w: i32,
     pub screen_h: i32,
     pub fps: u32,
+    pub overworld: World,
 }
 
 impl GameState {
@@ -36,6 +39,7 @@ pub fn new_gamestate() -> GameState {
         player_speed: 0,
         player_static_speed: 3,
         fps: 0,
+        overworld: WorldTemplate::new(),
     };
 }
 

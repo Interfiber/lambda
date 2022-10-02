@@ -2,7 +2,7 @@ use sdl2::rect::Point;
 
 use super::entitys::player::PlayerEntity;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct SpawnedEntity {
     pub entity_type: EntityType,
     pub x: i32,
@@ -45,7 +45,7 @@ pub enum Direction {
     WEST,  // left
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum EntityType {
     PLAYER,
 }

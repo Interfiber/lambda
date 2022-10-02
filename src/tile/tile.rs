@@ -6,7 +6,7 @@ pub trait Tile {
     fn get_hardness(&self) -> i32;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct WorldTile {
     pub x: i32,
     pub y: i32,
@@ -34,7 +34,7 @@ impl WorldTile {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum TileType {
     GRASS,
     SAND,

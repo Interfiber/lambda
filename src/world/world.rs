@@ -9,6 +9,7 @@ use crate::{
 };
 use sdl2::video::Window;
 
+#[derive(Clone)]
 pub struct World {
     world_data: Vec<WorldTile>,
     entity_data: Vec<SpawnedEntity>,
