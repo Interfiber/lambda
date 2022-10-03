@@ -4,14 +4,14 @@ pub struct WaterTile {}
 
 impl Tile for WaterTile {
     fn get_type(&self) -> TileType {
-        return TileType::WATER;
+        TileType::Water
     }
 
     fn get_texture_path(&self) -> String {
-        return String::from("assets/water.png");
+        String::from("assets/water.png")
     }
 
     fn get_hardness(&self) -> i32 {
-        return 0;
+        0
     }
 }

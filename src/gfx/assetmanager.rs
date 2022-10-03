@@ -12,11 +12,11 @@ pub struct AssetManager {
 pub struct AssetManagerTemplate {}
 
 impl AssetManagerTemplate {
-    pub fn new() -> AssetManager {
-        return AssetManager {
+    pub fn create() -> AssetManager {
+        AssetManager {
             queue: Default::default(),
             textures: HashMap::new(),
-        };
+        }
     }
 }
 impl AssetManager {
@@ -28,7 +28,7 @@ impl AssetManager {
         info!("Loading assets from queue");
 
         let mut i = 0;
-        for asset_path in self.queue.as_ref().unwrap().into_iter() {
+        for asset_path in self.queue.as_ref().unwrap().iter() {
             i += 1;
             info!(
                 "Loading asset: {} [{}/{}]",
@@ -37,7 +37,7 @@ impl AssetManager {
                 self.queue.as_ref().unwrap().len()
             );
 
-            let texture = match texture_creator.load_texture(asset_path.to_string()) {
+            let texture = match texture_creator.load_texture(asset_path) {
                 Ok(result) => result,
                 Err(err) => {
                     error!("Texture loading error: {}", err);
@@ -46,7 +46,7 @@ impl AssetManager {
             };
 
             self.textures.insert(asset_path.to_string(), texture);
-            let texture = match texture_creator.load_texture(asset_path.to_string()) {
+            let texture = match texture_creator.load_texture(asset_path) {
                 Ok(result) => result,
                 Err(err) => {
                     error!("Texture loading error: {}", err);
@@ -69,9 +69,8 @@ impl AssetManager {
     }
 
     pub fn get_texture(&self, asset_path: String) -> &Texture {
-        return self
-            .textures
+        self.textures
             .get(&asset_path)
-            .expect("Failed to find texture");
+            .expect("Failed to find texture")
     }
 }

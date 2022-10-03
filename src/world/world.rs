@@ -18,11 +18,11 @@ pub struct World {
 pub struct WorldTemplate {}
 
 impl WorldTemplate {
-    pub fn new() -> World {
-        return World {
+    pub fn create() -> World {
+        World {
             world_data: vec![],
             entity_data: vec![],
-        };
+        }
     }
 }
 
@@ -37,7 +37,7 @@ impl World {
 
     pub fn render(&self, canvas: &mut Canvas<Window>, asset_manager: &AssetManager) {
         // render world
-        for tile in self.world_data.to_vec().into_iter() {
+        for tile in self.world_data.iter().copied() {
             let point = Point::new(tile.x, tile.y);
             if GAME.lock().camera.contains_point(point) {
                 let mut dst = crate::tile::utils::get_tile_rect(tile.x, tile.y);
@@ -56,7 +56,7 @@ impl World {
         }
 
         // render entitys
-        for entity in self.entity_data.to_vec().iter() {
+        for entity in self.entity_data.iter().copied() {
             let entity_info = entity.to_entity();
             let cam_x = GAME.lock().camera.x;
             let cam_y = GAME.lock().camera.y;

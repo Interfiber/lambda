@@ -30,8 +30,8 @@ impl GameState {
 }
 
 pub fn new_gamestate() -> GameState {
-    return GameState {
-        player_facing: Direction::NORTH,
+    GameState {
+        player_facing: Direction::North,
         player_position: Point::new(100, 100),
         camera: sdl2::rect::Rect::new(0, 0, 1000, 1000),
         screen_h: 0,
@@ -39,8 +39,8 @@ pub fn new_gamestate() -> GameState {
         player_speed: 0,
         player_static_speed: 3,
         fps: 0,
-        overworld: WorldTemplate::new(),
-    };
+        overworld: WorldTemplate::create(),
+    }
 }
 
 lazy_static! {

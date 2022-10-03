@@ -21,5 +21,5 @@ pub fn render_font_to_texture(
         .map_err(|e| e.to_string())
         .expect("Failed to create texture from surface!");
 
-    return (surface.width(), surface.height(), font_texture);
+    (surface.width(), surface.height(), font_texture)
 }

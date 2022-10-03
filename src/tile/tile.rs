@@ -18,25 +18,25 @@ impl WorldTile {
     where
         T: Tile,
     {
-        return WorldTile {
-            x: x,
-            y: y,
+        WorldTile {
+            x,
+            y,
             tile_type: tile.get_type(),
-        };
+        }
     }
 
     pub fn to_tile(&self) -> Box<dyn Tile> {
         match self.tile_type {
-            TileType::SAND => return Box::new(SandTile {}),
-            TileType::GRASS => return Box::new(GrassTile {}),
-            TileType::WATER => return Box::new(WaterTile {}),
+            TileType::Sand => Box::new(SandTile {}),
+            TileType::Grass => Box::new(GrassTile {}),
+            TileType::Water => Box::new(WaterTile {}),
         }
     }
 }
 
 #[derive(Clone, Copy)]
 pub enum TileType {
-    GRASS,
-    SAND,
-    WATER,
+    Grass,
+    Sand,
+    Water,
 }

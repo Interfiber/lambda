@@ -1,8 +1,6 @@
 use perlin2d::PerlinNoise2D;
-use sdl2::EventPump;
 use sdl2::render::Canvas;
-use sdl2::render::WindowCanvas;
-use sdl2::video::WindowContext;
+use sdl2::EventPump;
 
 use crate::game::gamestate::GAME;
 use crate::gfx::assetmanager::AssetManager;
@@ -12,8 +10,8 @@ use crate::tile::tiles::sand::*;
 use crate::tile::tiles::water::*;
 use crate::world::world::World;
 
-pub fn generate_overworld(world: &mut World, seed: u128) {
-    let perlin = PerlinNoise2D::new(6, 10.0, 0.5, 1.0, 2.0, (100.0, 100.0), 0.5, seed as i32);
+pub fn generate_overworld(world: &mut World, seed: i32) {
+    let perlin = PerlinNoise2D::new(6, 10.0, 0.5, 1.0, 2.0, (100.0, 100.0), 0.5, seed);
 
     for x in 0..1000 {
         for y in 0..1000 {
@@ -30,7 +28,11 @@ pub fn generate_overworld(world: &mut World, seed: u128) {
     }
 }
 
-pub fn render_overworld(event_pump: &mut EventPump, asset_manager: &AssetManager, canvas: &mut Canvas<sdl2::video::Window>) {
+pub fn render_overworld(
+    event_pump: &mut EventPump,
+    asset_manager: &AssetManager,
+    canvas: &mut Canvas<sdl2::video::Window>,
+) {
     let mut overworld = GAME.lock().overworld.clone();
     overworld.update_entitys(event_pump);
     overworld.render(canvas, asset_manager);

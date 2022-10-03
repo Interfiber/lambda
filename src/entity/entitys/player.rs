@@ -15,16 +15,16 @@ impl Entity for PlayerEntity {
         let facing = GAME.lock().player_facing;
 
         match facing {
-            Direction::NORTH => {
+            Direction::North => {
                 pos = pos.offset(0, -speed);
             }
-            Direction::SOUTH => {
+            Direction::South => {
                 pos = pos.offset(0, speed);
             }
-            Direction::EAST => {
+            Direction::East => {
                 pos = pos.offset(speed, 0);
             }
-            Direction::WEST => {
+            Direction::West => {
                 pos = pos.offset(-speed, 0);
             }
         }
@@ -37,29 +37,29 @@ impl Entity for PlayerEntity {
 
     fn get_texture_path(&self) -> String {
         match GAME.lock().player_facing {
-            Direction::NORTH => return String::from("assets/player_walk_up.png"),
-            Direction::SOUTH => return String::from("assets/player_walk_down.png"),
-            Direction::EAST => return String::from("assets/player_walk_right.png"),
-            Direction::WEST => return String::from("assets/player_walk_left.png"),
+            Direction::North => String::from("assets/player_walk_up.png"),
+            Direction::South => String::from("assets/player_walk_down.png"),
+            Direction::East => String::from("assets/player_walk_right.png"),
+            Direction::West => String::from("assets/player_walk_left.png"),
         }
     }
 
     fn get_texture_height(&self) -> i32 {
-        return 16;
+        16
     }
 
     fn get_texture_width(&self) -> i32 {
-        return 16;
+        16
     }
 
     fn get_type(&self) -> EntityType {
-        return EntityType::PLAYER;
+        EntityType::Player
     }
 
     fn get_position(&self) -> sdl2::rect::Point {
         let x = GAME.lock().player_position.x;
         let y = GAME.lock().player_position.y;
 
-        return Point::new(x, y);
+        Point::new(x, y)
     }
 }

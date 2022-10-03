@@ -14,16 +14,16 @@ impl SpawnedEntity {
     where
         T: Entity,
     {
-        return SpawnedEntity {
+        SpawnedEntity {
             x: entity.get_position().x(),
             y: entity.get_position().y,
             entity_type: entity.get_type(),
-        };
+        }
     }
 
     pub fn to_entity(&self) -> Box<dyn Entity> {
         match self.entity_type {
-            EntityType::PLAYER => return Box::new(PlayerEntity {}),
+            EntityType::Player => Box::new(PlayerEntity {}),
         }
     }
 }
@@ -39,13 +39,13 @@ pub trait Entity {
 
 #[derive(Clone, Debug, Copy)]
 pub enum Direction {
-    NORTH, // up
-    SOUTH, // down
-    EAST,  // right
-    WEST,  // left
+    North, // up
+    South, // down
+    East,  // right
+    West,  // left
 }
 
 #[derive(Clone, Copy)]
 pub enum EntityType {
-    PLAYER,
+    Player,
 }

@@ -17,28 +17,28 @@ pub fn key_events(event_pump: &mut EventPump) {
                 ..
             } => {
                 GAME.lock().restore_speed();
-                GAME.lock().player_facing = Direction::NORTH;
+                GAME.lock().player_facing = Direction::North;
             }
             Event::KeyDown {
                 keycode: Some(Keycode::S),
                 ..
             } => {
                 GAME.lock().restore_speed();
-                GAME.lock().player_facing = Direction::SOUTH;
+                GAME.lock().player_facing = Direction::South;
             }
             Event::KeyDown {
                 keycode: Some(Keycode::A),
                 ..
             } => {
                 GAME.lock().restore_speed();
-                GAME.lock().player_facing = Direction::WEST;
+                GAME.lock().player_facing = Direction::West;
             }
             Event::KeyDown {
                 keycode: Some(Keycode::D),
                 ..
             } => {
                 GAME.lock().restore_speed();
-                GAME.lock().player_facing = Direction::EAST;
+                GAME.lock().player_facing = Direction::East;
             }
             Event::KeyUp {
                 keycode: Some(Keycode::W),

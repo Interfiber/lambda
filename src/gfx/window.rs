@@ -1,16 +1,15 @@
-use std::time::SystemTime;
-
 use crate::entity::entity::SpawnedEntity;
 use crate::entity::entitys::player::PlayerEntity;
 use crate::game::gamestate::GAME;
 use crate::gfx::fontmanager::{FontDetails, FontManager};
+use crate::overlay::overlay::Overlay;
+use crate::world::world::WorldTemplate;
+use rand::prelude::*;
 use sdl2::gfx::framerate::FPSManager;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::WindowContext;
-
-use crate::world::world::WorldTemplate;
 
 use super::assetmanager::{AssetManager, AssetManagerTemplate};
 
@@ -27,14 +26,14 @@ pub struct Window {
 }
 
 impl WindowTemplate {
-    pub fn new(title: &str) -> Window {
-        return Window {
+    pub fn create(title: &str) -> Window {
+        Window {
             title: title.to_string(),
             texture_creator: Default::default(),
             load_assets: false,
-            asset_manager: Some(AssetManagerTemplate::new()),
+            asset_manager: Some(AssetManagerTemplate::create()),
             fullscreen: false,
-        };
+        }
     }
 }
 
@@ -87,13 +86,13 @@ impl Window {
             .event_pump()
             .expect("Failed to create event punp");
 
-        let mut world = WorldTemplate::new();
+        let mut world = WorldTemplate::create();
 
         info!("Generating world");
-        let seed = SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("Failed to get time since unix epoch");
-        crate::utils::world::generate_overworld(&mut world, seed.as_millis());
+        let mut rand = thread_rng();
+        let seed = rand.gen_range(0..i32::MAX);
+        info!("World seed is: {}", seed);
+        crate::utils::world::generate_overworld(&mut world, seed);
 
         world.spawn_entity(SpawnedEntity::from_entity(PlayerEntity {}));
         info!("World generated");
@@ -113,51 +112,18 @@ impl Window {
             Self::ajust_screen(&canvas);
 
             canvas.clear();
-            crate::utils::world::render_overworld(&mut event_pump, self.asset_manager.as_ref().unwrap(), &mut canvas);
-            let font = font_manager
-                .load(&FontDetails {
-                    path: "assets/LanaPixel.ttf".to_string(),
-                    size: 10,
-                })
-                .expect("Failed to load font");
-
-            let font_info = crate::utils::font::render_font_to_texture(
-                &font,
-                &self.texture_creator.as_ref().unwrap(),
-                &format!("FPS: {}", GAME.lock().fps.to_string()),
+            crate::utils::world::render_overworld(
+                &mut event_pump,
+                self.asset_manager.as_ref().unwrap(),
+                &mut canvas,
             );
-
-            let pos = GAME.lock().player_position;
-
-            let font_info_2 = crate::utils::font::render_font_to_texture(
-                &font,
-                &self.texture_creator.as_ref().unwrap(),
-                &format!("Position: {}, {}", pos.x, pos.y),
-            );
-
-            let rect = Rect::new(0, 0, font_info.0, font_info.1);
-
-            canvas.copy(&font_info.2, None, rect).expect("Copy failed!");
-            canvas
-                .copy(
-                    &font_info_2.2,
-                    None,
-                    Rect::new(0, font_info.1 as i32, font_info_2.0, font_info_2.1),
-                )
-                .expect("Copy failed!");
-
-            unsafe {
-                font_info.2.destroy();
-                font_info_2.2.destroy();
-            }
-
+            self.render_overlay(&mut canvas, &mut font_manager, crate::overlay::overlays::debug::DebugOverlay {});
             canvas.present();
 
             fps.delay();
             let new = sdl_context.timer().unwrap().ticks();
 
             GAME.lock().fps = 1000 / (new - old);
-            // info!("Deltatime: {}", (new - old) as f32 * 0.4);
         }
     }
 
@@ -168,6 +134,10 @@ impl Window {
 
     pub fn set_fullscreen(&mut self, enabled: bool) {
         self.fullscreen = enabled;
+    }
+
+    pub fn render_overlay<T>(&self, canvas: &mut Canvas<sdl2::video::Window>, font_manager: &mut FontManager, overlay: T) where T : Overlay {
+        overlay.render_overlay(canvas, self.asset_manager.as_ref().unwrap(), font_manager);
     }
 
     pub fn ajust_screen(canvas: &Canvas<sdl2::video::Window>) {
