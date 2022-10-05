@@ -1,13 +1,13 @@
 use crate::entity::entity::SpawnedEntity;
 use crate::entity::entitys::player::PlayerEntity;
 use crate::game::gamestate::GAME;
-use crate::gfx::fontmanager::{FontDetails, FontManager};
+use crate::gfx::fontmanager::FontManager;
 use crate::overlay::overlay::Overlay;
 use crate::world::world::WorldTemplate;
 use rand::prelude::*;
 use sdl2::gfx::framerate::FPSManager;
 use sdl2::pixels::Color;
-use sdl2::rect::Rect;
+
 use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::WindowContext;
 
@@ -117,7 +117,11 @@ impl Window {
                 self.asset_manager.as_ref().unwrap(),
                 &mut canvas,
             );
-            self.render_overlay(&mut canvas, &mut font_manager, crate::overlay::overlays::debug::DebugOverlay {});
+            self.render_overlay(
+                &mut canvas,
+                &mut font_manager,
+                crate::overlay::overlays::debug::DebugOverlay {},
+            );
             canvas.present();
 
             fps.delay();
@@ -136,7 +140,14 @@ impl Window {
         self.fullscreen = enabled;
     }
 
-    pub fn render_overlay<T>(&self, canvas: &mut Canvas<sdl2::video::Window>, font_manager: &mut FontManager, overlay: T) where T : Overlay {
+    pub fn render_overlay<T>(
+        &self,
+        canvas: &mut Canvas<sdl2::video::Window>,
+        font_manager: &mut FontManager,
+        overlay: T,
+    ) where
+        T: Overlay,
+    {
         overlay.render_overlay(canvas, self.asset_manager.as_ref().unwrap(), font_manager);
     }
 

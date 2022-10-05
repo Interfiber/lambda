@@ -4,6 +4,8 @@ use sdl2::EventPump;
 
 use crate::entity::entity::Direction;
 use crate::game::gamestate::GAME;
+use crate::tile::tile::WorldTile;
+use crate::tile::tiles::sand::SandTile;
 
 pub fn key_events(event_pump: &mut EventPump) {
     for event in event_pump.poll_iter() {
@@ -62,7 +64,9 @@ pub fn key_events(event_pump: &mut EventPump) {
                 keycode: Some(Keycode::Z),
                 ..
             } => {
-                info!("Place tile");
+                GAME.lock()
+                    .overworld
+                    .insert_tile(WorldTile::from_tile(0, 0, SandTile {}));
             }
             _ => {}
         }
