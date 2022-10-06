@@ -40,7 +40,7 @@ impl World {
         for tile in self.world_data.iter().copied() {
             let point = Point::new(tile.x, tile.y);
             if GAME.lock().camera.contains_point(point) {
-                let mut dst = crate::tile::utils::get_tile_rect(tile.x, tile.y);
+                let mut dst = crate::utils::tile::get_tile_rect(tile.x, tile.y);
                 let cam_x = GAME.lock().camera.x;
                 let cam_y = GAME.lock().camera.y;
                 dst.x -= cam_x;

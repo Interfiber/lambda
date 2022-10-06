@@ -6,13 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-env_logger = "0.9.1"
-log = "0.4.0"
-hashbrown = "0.12.3"
-perlin2d = "0.2.6"
-lazy_static = "1.4.0"
-parking_lot = "0.12.1"
-rand = "0.8.5"
+env_logger = "0.9.1" # logging impl
+log = "0.4.0" # logging
+hashbrown = "0.12.3" # hashmap
+perlin2d = "0.2.6" # perlin noise
+lazy_static = "1.4.0" # global structs
+parking_lot = "0.12.1" # Mutex
+rand = "0.8.5" # random numbers
+ron = "0.8.0" # item info, and config files
+serde = { version = "1.0.145", features = ["derive"] } # serde for seriliazation
 
 [dependencies.sdl2]
 version = "0.35.2"

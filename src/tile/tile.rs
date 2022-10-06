@@ -1,4 +1,4 @@
-use super::tiles::{grass::GrassTile, sand::SandTile, water::WaterTile};
+use super::tiles::{grass::GrassTile, sand::SandTile, water::WaterTile, wood::WoodTile};
 
 pub trait Tile {
     fn get_type(&self) -> TileType;
@@ -30,6 +30,7 @@ impl WorldTile {
             TileType::Sand => Box::new(SandTile {}),
             TileType::Grass => Box::new(GrassTile {}),
             TileType::Water => Box::new(WaterTile {}),
+            TileType::Wood => Box::new(WoodTile {}),
         }
     }
 }
@@ -39,4 +40,5 @@ pub enum TileType {
     Grass,
     Sand,
     Water,
+    Wood,
 }

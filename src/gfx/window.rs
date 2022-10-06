@@ -106,6 +106,8 @@ impl Window {
         info!("Starting game loop");
 
         loop {
+            // always hide cursor
+            sdl_context.mouse().show_cursor(false);
             crate::gfx::events::key_events(&mut event_pump);
 
             let old = sdl_context.timer().unwrap().ticks();

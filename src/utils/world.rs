@@ -12,17 +12,30 @@ use crate::world::world::World;
 
 pub fn generate_overworld(world: &mut World, seed: i32) {
     let perlin = PerlinNoise2D::new(6, 10.0, 0.5, 1.0, 2.0, (100.0, 100.0), 0.5, seed);
+    let tile_size = GAME.lock().tile_size;
 
     for x in 0..1000 {
         for y in 0..1000 {
             let noise = perlin.get_noise(x as f64, y as f64);
 
             if noise < -6.0 {
-                world.insert_tile(WorldTile::from_tile(x * 32, y * 32, WaterTile {}));
+                world.insert_tile(WorldTile::from_tile(
+                    x * tile_size,
+                    y * tile_size,
+                    WaterTile {},
+                ));
             } else if noise < -4.0 {
-                world.insert_tile(WorldTile::from_tile(x * 32, y * 32, SandTile {}));
+                world.insert_tile(WorldTile::from_tile(
+                    x * tile_size,
+                    y * tile_size,
+                    SandTile {},
+                ));
             } else {
-                world.insert_tile(WorldTile::from_tile(x * 32, y * 32, GrassTile {}));
+                world.insert_tile(WorldTile::from_tile(
+                    x * tile_size,
+                    y * tile_size,
+                    GrassTile {},
+                ));
             }
         }
     }

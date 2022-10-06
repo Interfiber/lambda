@@ -17,6 +17,7 @@ pub struct GameState {
     pub screen_h: i32,
     pub fps: u32,
     pub overworld: World,
+    pub tile_size: i32,
 }
 
 impl GameState {
@@ -26,6 +27,15 @@ impl GameState {
 
     pub fn restore_speed(&mut self) {
         self.player_speed = self.player_static_speed;
+    }
+
+    pub fn get_position_infront_of_player(&self) -> Point {
+        match self.player_facing {
+            Direction::North => return self.player_position.offset(0, -self.tile_size),
+            Direction::South => return self.player_position.offset(0, self.tile_size),
+            Direction::East => return self.player_position.offset(self.tile_size, 0),
+            Direction::West => return self.player_position.offset(-self.tile_size, 0),
+        }
     }
 }
 
@@ -40,6 +50,7 @@ pub fn new_gamestate() -> GameState {
         player_static_speed: 3,
         fps: 0,
         overworld: WorldTemplate::create(),
+        tile_size: 32,
     }
 }
 
