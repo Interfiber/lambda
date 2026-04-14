@@ -12,7 +12,7 @@ hashbrown = "0.12.3" # hashmap
 perlin2d = "0.2.6" # perlin noise
 lazy_static = "1.4.0" # global structs
 parking_lot = "0.12.1" # Mutex
-rand = "0.8.5" # random numbers
+rand = "0.9.3" # random numbers
 ron = "0.8.0" # item info, and config files
 serde = { version = "1.0.145", features = ["derive"] } # serde for seriliazation
 
